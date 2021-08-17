@@ -3,7 +3,7 @@
 , buildPackages, splicePackages, newScope
 , bsdSetupHook, makeSetupHook, fetchcvs, groff, mandoc, byacc, flex
 , zlib
-, writeText, symlinkJoin
+, writeText, symlinkJoin, breakpointHook
 }:
 
 let
@@ -108,48 +108,14 @@ in lib.makeScopeWithSplicing
   ##
   ## START BOOTSTRAPPING
   ##
-  # TODO: Need to bootstrap the entire OpenBSD make infrastructure.
-  #       Not sure what's the best for now.
 
-  #       We could generate buildmake.sh similar to how NetBSD does it.
+  # TODO: Need to bootstrap OpenBSD make infrastructure
+  #       Let's see how far we can get away with this.
+  makeMinimal = buildPackages.netbsd.makeMinimal;
 
-  #       Not sure if we could get it upstream since cross-building
-  #       from other OSes isn't really a thing on OpenBSD, as far as I'm aware.
-
-  #       or we can just "borrow" NetBSD's make infrastructure and
-  #       try to build our make from it.
-  makeMinimal = mkDerivation {
-    path = "usr.bin/make";
-    sha256 = "0fh0nrnk18m613m5blrliq2aydciv51qhc0ihsj4k63incwbk90n";
-    version = "6.9";
-
-    buildInputs = with self; [];
-    nativeBuildInputs = with buildPackages.openbsd; [ bsdSetupHook rsync ];
-
-    skipIncludesPhase = true;
-
-    postPatch = ''
-      patchShebangs configure
-      ${self.make.postPatch}
-    '';
-    buildPhase = ''
-      runHook preBuild
-
-      sh ./buildmake.sh
-
-      runHook postBuild
-    '';
-    installPhase = ''
-      runHook preInstall
-
-      install -D make $out/bin/make
-      mkdir -p $out/share
-      cp -r $BSDSRCDIR/share/mk $out/share/mk
-
-      runHook postInstall
-    '';
-    extraPaths = with self; [ make.src ] ++ make.extraPaths;
-  };
+  # TODO: Use OpenBSD version of the following tools.
+  tsort = buildPackages.netbsd.tsort;
+  lorder = buildPackages.netbsd.lorder;
 
   # Don't add this to nativeBuildInputs directly.  Use statHook instead.
   stat = mkDerivation {
@@ -176,6 +142,16 @@ in lib.makeScopeWithSplicing
   ##
   ## START COMMAND LINE TOOLS
   ##
+  install = mkDerivation {
+    path = "usr.bin/xinstall";
+    sha256 = "09szl3lp9s081h7f3nci5h9zc78wlk9a6g18mryrznrss90q9ngx";
+    version = "6.9";
+    nativeBuildInputs = with buildPackages.openbsd; [
+      bsdSetupHook
+      makeMinimal
+      breakpointHook
+    ];
+  };
 
   make = mkDerivation {
     path = "usr.bin/make";

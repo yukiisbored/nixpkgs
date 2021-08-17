@@ -108,6 +108,16 @@ in lib.makeScopeWithSplicing
   ##
   ## START BOOTSTRAPPING
   ##
+  # TODO: Need to bootstrap the entire OpenBSD make infrastructure.
+  #       Not sure what's the best for now.
+
+  #       We could generate buildmake.sh similar to how NetBSD does it.
+
+  #       Not sure if we could get it upstream since cross-building
+  #       from other OSes isn't really a thing on OpenBSD, as far as I'm aware.
+
+  #       or we can just "borrow" NetBSD's make infrastructure and
+  #       try to build our make from it.
   makeMinimal = mkDerivation {
     path = "usr.bin/make";
     sha256 = "0fh0nrnk18m613m5blrliq2aydciv51qhc0ihsj4k63incwbk90n";

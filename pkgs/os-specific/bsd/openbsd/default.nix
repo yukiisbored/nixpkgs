@@ -46,9 +46,6 @@ in lib.makeScopeWithSplicing
   #
   # For non-bootstrap-critical packages, we might as well use `callPackage` for
   # consistency with everything else, and maybe put in separate files too.
-
-  compatIfNeeded = lib.optional (!stdenvNoCC.hostPlatform.isOpenBSD) self.compat;
-
   mkDerivation = lib.makeOverridable (attrs: let
     stdenv' = if attrs.noCC or false then stdenvNoCC else stdenv;
   in stdenv'.mkDerivation ({
@@ -62,7 +59,6 @@ in lib.makeScopeWithSplicing
       makeMinimal
       install tsort lorder mandoc groff statHook
     ];
-    buildInputs = with self; compatIfNeeded;
 
     HOST_SH = stdenv'.shell;
 
@@ -237,7 +233,6 @@ in lib.makeScopeWithSplicing
       bsdSetupHook
       makeMinimal install mandoc byacc flex
     ];
-    buildInputs = with self; compatIfNeeded;
     extraPaths = with self; [ cksum.src ];
   };
 
@@ -357,7 +352,6 @@ in lib.makeScopeWithSplicing
     version = "6.9";
     sha256 = "1wqhngraxwqk4jgrf5f18jy195yrp7c06n1gf31pbplq79mg1bcj";
     buildInputs = with self; [ libterminfo libcurses ];
-    propagatedBuildInputs = with self; compatIfNeeded;
     SHLIBINSTALLDIR = "$(out)/lib";
     makeFlags = [ "LIBDO.terminfo=${self.libterminfo}/lib" ];
     postPatch = ''
@@ -383,7 +377,6 @@ in lib.makeScopeWithSplicing
       "-D__va_list=va_list"
       "-D__warn_references(a,b)="
     ] ++ lib.optional stdenv.isDarwin "-D__strong_alias(a,b)=";
-    propagatedBuildInputs = with self; compatIfNeeded;
     MKDOC = "no"; # missing vfontedpr
     makeFlags = [ "LIBDO.terminfo=${self.libterminfo}/lib" ];
     postPatch = lib.optionalString (!stdenv.isDarwin) ''

@@ -420,6 +420,8 @@ rec {
         then { cpu = elemAt l 0; vendor = elemAt l 1; kernel = "mmixware";                   }
       else if hasPrefix "netbsd" (elemAt l 2)
         then { cpu = elemAt l 0; vendor = elemAt l 1;    kernel = elemAt l 2;                }
+      else if hasPrefix "openbsd" (elemAt l 2)
+        then { cpu = elemAt l 0; vendor = elemAt l 1; kernel = elemAt l 2;                   }
       else if (elem (elemAt l 2) ["eabi" "eabihf" "elf"])
         then { cpu = elemAt l 0; vendor = "unknown"; kernel = elemAt l 1; abi = elemAt l 2; }
       else if (elemAt l 2 == "ghcjs")

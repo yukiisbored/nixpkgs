@@ -7,6 +7,8 @@
 }:
 
 let
+  inherit (buildPackages.buildPackages) rsync;
+
   fetchOpenBSD = path: version: sha256: fetchcvs {
     cvsRoot = ":pserver:anoncvs@anoncvs.ca.openbsd.org:/cvsroot";
     module = "src/${path}";
@@ -57,7 +59,7 @@ in lib.makeScopeWithSplicing
     nativeBuildInputs = with buildPackages.openbsd; [
       bsdSetupHook
       makeMinimal
-      install tsort lorder mandoc groff statHook
+      install tsort lorder mandoc groff statHook rsync
     ];
 
     HOST_SH = stdenv'.shell;
@@ -112,7 +114,7 @@ in lib.makeScopeWithSplicing
     version = "6.9";
 
     buildInputs = with self; [];
-    nativeBuildInputs = with buildPackages.openbsd; [ bsdSetupHook ];
+    nativeBuildInputs = with buildPackages.openbsd; [ bsdSetupHook rsync ];
 
     skipIncludesPhase = true;
 
